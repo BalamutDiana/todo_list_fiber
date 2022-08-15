@@ -13,6 +13,10 @@ import (
 	"github.com/BalamutDiana/todo_list_fiber/pkg/database"
 )
 
+type todo struct {
+	Item string
+}
+
 func main() {
 
 	db, err := database.NewPostgresConnection(database.ConnectionInfo{
@@ -78,12 +82,33 @@ func indexHandler(c *fiber.Ctx, db *sql.DB) error {
 		"Todos": todos,
 	})
 }
+
 func postHandler(c *fiber.Ctx, db *sql.DB) error {
-	return c.SendString("Hello postHandler")
+	newTodo := todo{}
+	if err := c.BodyParser(&newTodo); err != nil {
+		log.Printf("An error occured: %v", err)
+		return c.SendString(err.Error())
+	}
+	fmt.Printf("%v", newTodo)
+	if newTodo.Item != "" {
+		_, err := db.Exec("INSERT into todo VALUES ($1)", newTodo.Item)
+		if err != nil {
+			log.Fatalf("An error occured while executing query: %v", err)
+		}
+	}
+
+	return c.Redirect("/")
 }
+
 func putHandler(c *fiber.Ctx, db *sql.DB) error {
-	return c.SendString("Hello putHandler")
+	olditem := c.Query("olditem")
+	newitem := c.Query("newitem")
+	db.Exec("UPDATE todo SET item=$1 WHERE item=$2", newitem, olditem)
+	return c.Redirect("/")
 }
+
 func deleteHandler(c *fiber.Ctx, db *sql.DB) error {
-	return c.SendString("Hello deleteHandler")
+	todoToDelete := c.Query("item")
+	db.Exec("DELETE from todo WHERE item=$1", todoToDelete)
+	return c.SendString("deleted")
 }
