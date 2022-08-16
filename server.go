@@ -9,6 +9,7 @@ import (
 	"github.com/gofiber/template/html"
 	_ "github.com/lib/pq"
 
+	"github.com/BalamutDiana/todo_list_fiber/internal/repository"
 	"github.com/BalamutDiana/todo_list_fiber/internal/transport"
 	"github.com/BalamutDiana/todo_list_fiber/pkg/database"
 )
@@ -32,21 +33,23 @@ func main() {
 	app := fiber.New(fiber.Config{
 		Views: engine,
 	})
+	todos := repository.NewTodos(db)
+	handler := transport.NewHandler(todos)
 
-	app.Get("/", func(c *fiber.Ctx) error {
-		return transport.IndexHandler(c, db)
+	app.Get("/", func(ctx *fiber.Ctx) error {
+		return handler.IndexHandler(ctx)
 	})
 
-	app.Post("/", func(c *fiber.Ctx) error {
-		return transport.PostHandler(c, db)
+	app.Post("/", func(ctx *fiber.Ctx) error {
+		return handler.PostHandler(ctx)
 	})
 
-	app.Put("/update", func(c *fiber.Ctx) error {
-		return transport.PutHandler(c, db)
+	app.Put("/update", func(ctx *fiber.Ctx) error {
+		return handler.PutHandler(ctx)
 	})
 
-	app.Delete("/delete", func(c *fiber.Ctx) error {
-		return transport.DeleteHandler(c, db)
+	app.Delete("/delete", func(ctx *fiber.Ctx) error {
+		return handler.DeleteHandler(ctx)
 	})
 
 	port := os.Getenv("PORT")
