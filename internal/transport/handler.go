@@ -55,24 +55,21 @@ func (h *Handler) IndexHandler(ctx *fiber.Ctx) error {
 }
 
 func (h *Handler) PostHandler(ctx *fiber.Ctx) error {
-	err := h.todosService.InsertTodo(ctx)
-	if err != nil {
+	if err := h.todosService.InsertTodo(ctx); err != nil {
 		return err
 	}
 	return ctx.Redirect("/")
 }
 
 func (h *Handler) PutHandler(ctx *fiber.Ctx) error {
-	err := h.todosService.UpdateTodo(ctx)
-	if err != nil {
+	if err := h.todosService.InsertTodo(ctx); err != nil {
 		return err
 	}
 	return ctx.Redirect("/")
 }
 
 func (h *Handler) DeleteHandler(ctx *fiber.Ctx) error {
-	err := h.todosService.DeleteTodo(ctx)
-	if err != nil {
+	if err := h.todosService.DeleteTodo(ctx); err != nil {
 		return err
 	}
 	return ctx.SendString("deleted")

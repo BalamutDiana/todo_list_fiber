@@ -22,7 +22,7 @@ func main() {
 		Username: "postgres",
 		DBName:   "postgres",
 		SSLMode:  "disable",
-		Password: "1marvin2mode3",
+		Password: "password",
 	})
 	if err != nil {
 		log.Fatal(err)
