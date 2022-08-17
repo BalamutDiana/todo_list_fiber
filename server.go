@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
-	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/template/html"
 	_ "github.com/lib/pq"
 
@@ -22,40 +22,24 @@ func main() {
 		Username: "postgres",
 		DBName:   "postgres",
 		SSLMode:  "disable",
-		Password: "password",
+		Password: "1marvin2mode3",
 	})
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer db.Close()
 
-	engine := html.New("./views", ".html")
-	app := fiber.New(fiber.Config{
-		Views: engine,
-	})
 	todos := repository.NewTodos(db)
 	handler := transport.NewHandler(todos)
-
-	app.Get("/", func(ctx *fiber.Ctx) error {
-		return handler.IndexHandler(ctx)
-	})
-
-	app.Post("/", func(ctx *fiber.Ctx) error {
-		return handler.PostHandler(ctx)
-	})
-
-	app.Put("/update", func(ctx *fiber.Ctx) error {
-		return handler.PutHandler(ctx)
-	})
-
-	app.Delete("/delete", func(ctx *fiber.Ctx) error {
-		return handler.DeleteHandler(ctx)
-	})
+	engine := html.New("./views", ".html")
+	app := handler.InitRouter(engine)
 
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "3000"
 	}
+
+	log.Println("SERVER STARTED AT", time.Now().Format(time.RFC3339))
 
 	app.Static("/", "./public")
 	log.Fatalln(app.Listen(fmt.Sprintf(":%v", port)))

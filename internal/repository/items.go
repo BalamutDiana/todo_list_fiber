@@ -52,13 +52,17 @@ func (td *Todo) InsertTodo(ctx *fiber.Ctx) error {
 	return nil
 }
 
-func (td *Todo) UpdateTodo(ctx *fiber.Ctx) {
+func (td *Todo) UpdateTodo(ctx *fiber.Ctx) error {
 	olditem := ctx.Query("olditem")
 	newitem := ctx.Query("newitem")
-	td.db.Exec("UPDATE todo SET item=$1 WHERE item=$2", newitem, olditem)
+
+	_, err := td.db.Exec("UPDATE todo SET item=$1 WHERE item=$2", newitem, olditem)
+	return err
 }
 
-func (td *Todo) DeleteTodo(ctx *fiber.Ctx) {
+func (td *Todo) DeleteTodo(ctx *fiber.Ctx) error {
 	todoToDelete := ctx.Query("item")
-	td.db.Exec("DELETE from todo WHERE item=$1", todoToDelete)
+
+	_, err := td.db.Exec("DELETE from todo WHERE item=$1", todoToDelete)
+	return err
 }
